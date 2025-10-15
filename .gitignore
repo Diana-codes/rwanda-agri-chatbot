@@ -1,0 +1,12 @@
+.venv/
+__pycache__/
+*.pyc
+.env
+conversation_log.json
+
+# Big artifacts
+models/
+data/processed/
+# Allow small metadata
+!models/**/training_summary.json
+!data/**/dataset_info.json
