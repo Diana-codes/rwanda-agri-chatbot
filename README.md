@@ -1,27 +1,70 @@
-Rwanda Agricultural Chatbot
-A domain-specific conversational AI system for Rwanda agriculture, powered by FLAN-T5 and fine-tuned on synthetic Rwanda-specific and general agriculture Q&A datasets. Deployed via Gradio with multi-turn chat capabilities and out-of-domain (OOD) guarding.
-Quick Start
-Setup
+# Rwanda Agricultural Chatbot
 
-Environment Setup
+> A domain-specific conversational AI system for Rwanda agriculture, powered by FLAN-T5 and fine-tuned on synthetic Rwanda-specific and general agriculture Q&A datasets. Deployed via Gradio with multi-turn chat capabilities and out-of-domain guarding.
 
-bash   python3 -m venv .venv
-   source .venv/bin/activate
-   pip install --upgrade pip
-   pip install -r requirements.txt
-Requires Python 3.12
-Data Preparation
-Generate and tokenize synthetic datasets:
-bashpython3 -m src.data_prep \
+## ✨ Features
+
+- **🌾 Rwanda-Focused**: Fine-tuned on 800 synthetic Rwanda agricultural Q&A pairs covering crops, seasons, soils, and pests
+- **💬 Multi-turn Chat**: Contextual conversation support for follow-up questions
+- **🛡️ OOD Detection**: Identifies and safely handles queries outside agricultural scope with rule-based fallbacks
+- **⚡ CPU-Friendly**: Full training and inference support on CPU with option for GPU acceleration
+- **📊 Comprehensive Metrics**: BLEU, ROUGE, token-F1, and Perplexity evaluation
+- **🎯 Lightweight**: Clean, minimal UI with conversation logging disabled by default
+
+## 🚀 Quick Start
+
+### Prerequisites
+
+- Python 3.12
+- pip
+
+### Installation
+
+1. Clone the repository
+```bash
+git clone <repository-url>
+cd rwanda-agri-chatbot
+```
+
+2. Create and activate virtual environment
+```bash
+python3 -m venv .venv
+source .venv/bin/activate
+```
+
+3. Install dependencies
+```bash
+pip install --upgrade pip
+pip install -r requirements.txt
+```
+
+## 📊 Data Preparation
+
+Generate synthetic training datasets (no external CSVs required):
+
+```bash
+python3 -m src.data_prep \
   --output_dir data/processed \
   --generate_rwanda 800 \
   --generate_general 4000 \
   --max_input_length 256 \
   --max_target_length 128 \
   --upsample_limit 10
-Training
-Train the model using TensorFlow (CPU-friendly baseline):
-bashCUDA_VISIBLE_DEVICES="" python3 -m src.train \
+```
+
+This creates:
+- **800** Rwanda-specific Q&A pairs
+- **4000** general agriculture Q&A pairs
+- Normalized and tokenized datasets ready for training
+
+## 🏋️ Training
+
+### Baseline (CPU-Friendly)
+
+Train the FLAN-T5 base model with recommended hyperparameters:
+
+```bash
+CUDA_VISIBLE_DEVICES="" python3 -m src.train \
   --processed_dir data/processed \
   --model_name google/flan-t5-base \
   --output_dir models/run_balanced \
@@ -30,56 +73,135 @@ bashCUDA_VISIBLE_DEVICES="" python3 -m src.train \
   --learning_rate 5e-5 \
   --optimizer adamw \
   --warmup_ratio 0.06
-Evaluation
-Evaluate model performance on BLEU, ROUGE, token-F1, and Perplexity metrics:
-bashpython3 -m src.evaluate \
+```
+
+Training outputs are saved to `models/run_balanced/training_summary.json`
+
+### Lightweight Alternative
+
+For faster iteration on CPU, use the smaller variant:
+
+```bash
+CUDA_VISIBLE_DEVICES="" python3 -m src.train \
+  --model_name google/flan-t5-small \
+  --batch_size 8 \
+  --output_dir models/run_small
+```
+
+## 📈 Evaluation
+
+Evaluate model performance across multiple metrics:
+
+```bash
+python3 -m src.evaluate \
   --processed_dir data/processed \
   --model_dir models/run_balanced \
   --num_examples 200 \
   --report_perplexity
-Run the Application
-Start the Gradio web interface:
-bashpython3 -m src.app \
+```
+
+**Metrics reported:**
+- BLEU Score
+- ROUGE Score
+- Token-F1
+- Perplexity
+
+## 🎮 Run the Application
+
+Start the interactive Gradio chat interface:
+
+```bash
+python3 -m src.app \
   --model_dir models/run_balanced \
   --host 0.0.0.0 \
   --port 7860
-Project Structure
-ComponentFilePurposeProject DefinitionREADME.mdDomain justification and project overviewDataset & Preprocessingsrc/data_prep.pyGenerates Rwanda-specific Q&A (crops, seasons, soils, pests), text normalization, and tokenizationModel Fine-tuningsrc/train.pyTensorFlow fine-tuning with AdamW optimizer, learning rate warmup, and checkpoint resumption; logs training_summary.jsonEvaluation Metricssrc/evaluate.pyReports BLEU, ROUGE, token-F1, and optional Perplexity scoresUser Interfacesrc/app.pyMulti-turn conversational chat, OOD detection, and rule-based safety fallbacks
-Experiments & Hyperparameters
-Compare model configurations by tracking performance:
+```
 
-Learning Rate: 3e-5 vs 5e-5
-Optimizer: Adam vs AdamW (with 0.06 warmup)
-Batch Size: 2 vs 8 (with smaller model)
+Access the chatbot at `http://localhost:7860`
 
-Each training run saves detailed metrics to models/<run>/training_summary.json and evaluation outputs for report comparison.
-Model Variants
+## 📁 Project Structure
 
-Default: google/flan-t5-base – balanced performance and speed
-Lightweight: google/flan-t5-small – faster inference for CPU-only environments
+```
+rwanda-agri-chatbot/
+├── src/
+│   ├── data_prep.py          # Dataset generation and preprocessing
+│   ├── train.py              # Model fine-tuning (TensorFlow)
+│   ├── evaluate.py           # Evaluation metrics (BLEU, ROUGE, F1)
+│   └── app.py                # Gradio interface
+├── data/
+│   └── processed/            # Generated tokenized datasets
+├── models/
+│   └── run_balanced/         # Fine-tuned model checkpoints
+├── requirements.txt          # Python dependencies
+└── README.md                 # This file
+```
 
-Demo
-A 5–10 minute demo video should showcase:
+## 🔬 Experiments & Hyperparameters
 
-Environment setup and data generation
-Model training (short run)
-Evaluation metrics output
-UI interactions with in-domain and out-of-domain queries
-Seasonal agriculture Q&A examples
-Key findings and limitations
+Track performance across different configurations:
 
-Notes
+| Configuration | Learning Rate | Optimizer | Batch Size | Notes |
+|--------------|---------------|-----------|-----------|-------|
+| Baseline | 5e-5 | AdamW | 2 | Recommended |
+| Variant 1 | 3e-5 | AdamW | 2 | Lower LR |
+| Variant 2 | 5e-5 | Adam | 2 | No warmup |
+| Fast | 5e-5 | AdamW | 8 | Small model |
 
-CPU-only support: Full training runs on CPU; use google/flan-t5-small for faster iteration
-Privacy: Conversation logs are disabled by default; the UI remains clean and lightweight
-No external data required: All training data is synthetically generated
+Save results from `models/<run>/training_summary.json` for comparison in your report.
 
-Features
+## 💡 Model Information
 
-Multi-turn Chat: Contextual conversation support for follow-up questions
-Out-of-Domain Detection: Identifies and safely handles queries outside agricultural scope
-Rule-based Fallbacks: Safety mechanisms for uncertain predictions
-Rwanda-Focused: Trained on domain-specific agricultural knowledge for Rwanda
+- **Base Model**: FLAN-T5 (247M parameters)
+- **Fine-tuning**: TensorFlow with AdamW optimizer
+- **Learning Rate Warmup**: 0.06 ratio
+- **Training Data**: 4800 synthetic Q&A pairs
 
+## 🎬 Demo
 
-Get started in minutes: Clone the repository, run the setup commands, and launch the Gradio interface to interact with the chatbot!
+Create a 5–10 minute demo video showcasing:
+
+1. Environment setup and data generation
+2. Model training workflow
+3. Evaluation metrics and performance
+4. Interactive UI with in-domain queries (crops, seasons, soil management)
+5. Out-of-domain handling
+6. Key findings and limitations
+
+## 💻 System Requirements
+
+- **CPU**: Works on standard CPUs (tested on 2-4 cores)
+- **GPU**: Optional CUDA support for faster training
+- **RAM**: Minimum 4GB, recommended 8GB+
+- **Storage**: ~2GB for model and data
+
+## 📝 Notes
+
+- **Synthetic Data**: No external CSV files needed; all data is generated
+- **Privacy**: Conversation logs disabled by default for user privacy
+- **Scalability**: Easily extend with additional Rwanda-specific Q&A patterns
+- **Customization**: Modify `src/data_prep.py` to generate domain-specific content
+
+## 🛠️ Troubleshooting
+
+**Out of memory?**
+- Reduce `batch_size` to 1
+- Use `google/flan-t5-small` instead of base
+
+**Slow training?**
+- Enable GPU: Remove `CUDA_VISIBLE_DEVICES=""`
+- Use smaller model variant
+
+**Port already in use?**
+- Change `--port` parameter to an available port
+
+## 📄 License
+
+[Your License Here]
+
+## 🤝 Contributing
+
+Contributions are welcome! Please feel free to submit a Pull Request.
+
+---
+
+**Built for Rwanda 🇷🇼 | Made with ❤️ for agricultural innovation**
