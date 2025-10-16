@@ -1,0 +1,34 @@
+
+# Hugging Face Spaces Deployment Instructions
+
+## Step 1: Create Space
+1. Go to https://huggingface.co/new-space
+2. Choose "Gradio" as SDK
+3. Name it "rwanda-agri-bot" (or your preferred name)
+4. Set to Public
+
+## Step 2: Upload Files
+1. Upload these files to your Space:
+   - app.py
+   - requirements.txt
+   - README_HF_Spaces.md
+
+## Step 3: Upload Model
+1. Upload run_balanced.tar.gz to your Space
+2. Extract it in the Space (or upload the model files directly)
+
+## Step 4: Deploy
+1. The Space will automatically build and deploy
+2. Wait for the build to complete (usually 2-5 minutes)
+3. Your chatbot will be live at: https://yourusername-rwanda-agri-bot.hf.space
+
+## Step 5: Test
+1. Try sample questions:
+   - "When should I plant maize in Rwanda Season A?"
+   - "What soil is good for growing beans?"
+   - "How do I control fall armyworm?"
+
+## Troubleshooting
+- If model doesn't load: Check file paths in app.py
+- If build fails: Check requirements.txt versions
+- If slow: Normal for CPU inference on free tier
