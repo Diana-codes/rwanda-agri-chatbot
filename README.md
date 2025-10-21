@@ -158,14 +158,7 @@ Save results from `models/<run>/training_summary.json` for comparison in your re
 
 ## 🎬 Demo
 
-Create a 5–10 minute demo video showcasing:
-
-1. Environment setup and data generation
-2. Model training workflow
-3. Evaluation metrics and performance
-4. Interactive UI with in-domain queries (crops, seasons, soil management)
-5. Out-of-domain handling
-6. Key findings and limitations
+https://youtu.be/W_En_Ny74UE
 
 ## 💻 System Requirements
 
@@ -194,9 +187,14 @@ Create a 5–10 minute demo video showcasing:
 **Port already in use?**
 - Change `--port` parameter to an available port
 
-## 📄 License
+## Example Conversations
 
-[Your License Here]
+| Question | Answer |
+|----------|--------|
+| When should I plant maize in Rwanda? | Plant at the start of Season B (Mar–Jun) when rains begin. Use varieties like ZM607. |
+| What soil is good for beans? | Well-drained loamy soils; add compost and avoid waterlogging. |
+| Which crops grow well in sandy soils? | Maize, cassava, and groundnuts with added organic matter and mulch. |
+| What is the capital of Rwanda? | I'm focused on agriculture. Please ask about crops, soils, pests, seasons, or farming practices. |
 
 ## 🤝 Contributing
 
